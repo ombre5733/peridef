@@ -69,7 +69,7 @@ typedef struct
     volatile uint32_t MODER;
     volatile uint16_t OTYPER;
     uint16_t reserved0;
-    volatile uint32_t OSPEED;
+    volatile uint32_t OSPEEDR;
     volatile uint32_t PUPDR;
     volatile uint16_t IDR;
     uint16_t reserved1;
