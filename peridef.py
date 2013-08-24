@@ -483,7 +483,7 @@ class CFilePrinter(object):
         if m.offset:
             ofs = self.castedAddress(m.offset)
             addr += " + " + ofs
-        s = "#define {0:<30} (({1}_TypeDef*)({1}))\n".format(
+        s = "#define {0:<30} (({1}_TypeDef*)({2}))\n".format(
                 m.name, m.type, addr)
         return s
 
