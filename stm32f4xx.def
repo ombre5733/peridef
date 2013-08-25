@@ -82,6 +82,65 @@ peripheral(CAN, help="Controller area network")
     register(FilterRegister, CAN_FilterRegister, arraySize=28)
 }
 
+peripheral(FLASH, help="Flash interface")
+{
+    register(ACR, 16)
+    {
+        bit(LATENCY, 3)
+        reserved(5)
+        bit(PRFTEN)
+        bit(ICEN)
+        bit(DCEN)
+        bit(ICRST)
+        bit(DCRST)
+        reserved(3)
+    }
+    reserved(16)
+    register(KEYR, 32)
+    register(OPTKEYR, 32)
+    register(SR, 32)
+    {
+        bit(EOP)
+        bit(OPERR)
+        reserved(2)
+        bit(WRPERR)
+        bit(PGAERR)
+        bit(PGPERR)
+        bit(PGSERR)
+        reserved(8)
+        bit(BSY)
+        reserved(15)
+    }
+    register(CR, 32)
+    {
+        bit(PG)
+        bit(SER)
+        bit(MER)
+        bit(SNB, 4)
+        reserved(1)
+        bit(PSIZE, 2)
+        reserved(6)
+        bit(STRT)
+        reserved(7)
+        bit(EOPIE)
+        reserved(6)
+        bit(LOCK)
+    }
+    register(OPTCR, 32)
+    {
+        bit(OPTLOCK)
+        bit(OPTSTRT)
+        bit(BOR_LEV, 2)
+        reserved(1)
+        bit(WDG_SW)
+        bit(nRST_STOP)
+        bit(nRST_STDBY)
+        bit(RDP, 8)
+        bit(nWRP, 12)
+        reserved(4)
+    }
+}
+
 peripheral(GPIO, help="GPIO port")
 {
     register(MODER, 32, help="mode register")
@@ -160,6 +219,10 @@ peripheral(RCC)
         bit(PLLP, 2)
         reserved(4)
         bit(PLLSRC)
+        {
+            HSI = 0
+            HSE = 1
+        }
         reserved(1)
         bit(PLLQ, 4)
         reserved(4)
@@ -167,7 +230,17 @@ peripheral(RCC)
     register(CFGR, 32, help="clock configuration register")
     {
         bit(SW, 2)
+        {
+            HSI = 0b00
+            HSE = 0b01
+            PLL = 0b10
+        }
         bit(SWS, 2)
+        {
+            HSI = 0b00
+            HSE = 0b01
+            PLL = 0b10
+        }
         bit(HPRE, 4)
         {
             DIV1   = 0b0000
@@ -182,7 +255,21 @@ peripheral(RCC)
         }
         reserved(2)
         bit(PPRE1, 3)
+        {
+            DIV1  = 0b000
+            DIV2  = 0b100
+            DIV4  = 0b101
+            DIV8  = 0b110
+            DIV16 = 0b111
+        }
         bit(PPRE2, 3)
+        {
+            DIV1  = 0b000
+            DIV2  = 0b100
+            DIV4  = 0b101
+            DIV8  = 0b110
+            DIV16 = 0b111
+        }
         bit(RTCPRE, 5)
         bit(MCO1, 2)
         bit(I2SSRC)
@@ -500,6 +587,8 @@ address(AHB2_BASE, PERIPHERAL_BASE, 0x10000000)
 address(AHB3_BASE, PERIPHERAL_BASE, 0x60000000)
 
 // Map the peripheral definitions to addresses.
+map(FLASH, FLASH, AHB1_BASE, 0x3C00)
+
 map(GPIO, GPIOA, AHB1_BASE, 0x0000)
 map(GPIO, GPIOB, AHB1_BASE, 0x0400)
 map(GPIO, GPIOC, AHB1_BASE, 0x0800)

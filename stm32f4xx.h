@@ -66,6 +66,17 @@ typedef struct
 
 typedef struct
 {
+    volatile uint16_t ACR;
+    uint16_t reserved0;
+    volatile uint32_t KEYR;
+    volatile uint32_t OPTKEYR;
+    volatile uint32_t SR;
+    volatile uint32_t CR;
+    volatile uint32_t OPTCR;
+} FLASH_TypeDef;
+
+typedef struct
+{
     volatile uint32_t MODER;
     volatile uint16_t OTYPER;
     uint16_t reserved0;
@@ -149,6 +160,7 @@ typedef struct
 #define AHB2_BASE                      (PERIPHERAL_BASE + (uintptr_t)0x10000000)
 #define AHB3_BASE                      (PERIPHERAL_BASE + (uintptr_t)0x60000000)
 
+#define FLASH                          ((FLASH_TypeDef*)(AHB1_BASE + (uintptr_t)0x00003C00))
 #define GPIOA                          ((GPIO_TypeDef*)(AHB1_BASE + (uintptr_t)0x00000000))
 #define GPIOB                          ((GPIO_TypeDef*)(AHB1_BASE + (uintptr_t)0x00000400))
 #define GPIOC                          ((GPIO_TypeDef*)(AHB1_BASE + (uintptr_t)0x00000800))
@@ -190,6 +202,43 @@ typedef struct
 #define CAN_RDTR_FMI                   ((uint32_t)0x0000FF00)
 #define CAN_RDTR_TIME                  ((uint32_t)0xFFFF0000)
 
+/* Bit fields of the FLASH_ACR register */
+#define FLASH_ACR_LATENCY              ((uint16_t)0x0007)
+#define FLASH_ACR_PRFTEN               ((uint16_t)0x0100)
+#define FLASH_ACR_ICEN                 ((uint16_t)0x0200)
+#define FLASH_ACR_DCEN                 ((uint16_t)0x0400)
+#define FLASH_ACR_ICRST                ((uint16_t)0x0800)
+#define FLASH_ACR_DCRST                ((uint16_t)0x1000)
+
+/* Bit fields of the FLASH_SR register */
+#define FLASH_SR_EOP                   ((uint32_t)0x00000001)
+#define FLASH_SR_OPERR                 ((uint32_t)0x00000002)
+#define FLASH_SR_WRPERR                ((uint32_t)0x00000010)
+#define FLASH_SR_PGAERR                ((uint32_t)0x00000020)
+#define FLASH_SR_PGPERR                ((uint32_t)0x00000040)
+#define FLASH_SR_PGSERR                ((uint32_t)0x00000080)
+#define FLASH_SR_BSY                   ((uint32_t)0x00010000)
+
+/* Bit fields of the FLASH_CR register */
+#define FLASH_CR_PG                    ((uint32_t)0x00000001)
+#define FLASH_CR_SER                   ((uint32_t)0x00000002)
+#define FLASH_CR_MER                   ((uint32_t)0x00000004)
+#define FLASH_CR_SNB                   ((uint32_t)0x00000078)
+#define FLASH_CR_PSIZE                 ((uint32_t)0x00000300)
+#define FLASH_CR_STRT                  ((uint32_t)0x00010000)
+#define FLASH_CR_EOPIE                 ((uint32_t)0x01000000)
+#define FLASH_CR_LOCK                  ((uint32_t)0x80000000)
+
+/* Bit fields of the FLASH_OPTCR register */
+#define FLASH_OPTCR_OPTLOCK            ((uint32_t)0x00000001)
+#define FLASH_OPTCR_OPTSTRT            ((uint32_t)0x00000002)
+#define FLASH_OPTCR_BOR_LEV            ((uint32_t)0x0000000C)
+#define FLASH_OPTCR_WDG_SW             ((uint32_t)0x00000020)
+#define FLASH_OPTCR_nRST_STOP          ((uint32_t)0x00000040)
+#define FLASH_OPTCR_nRST_STDBY         ((uint32_t)0x00000080)
+#define FLASH_OPTCR_RDP                ((uint32_t)0x0000FF00)
+#define FLASH_OPTCR_nWRP               ((uint32_t)0x0FFF0000)
+
 /* Bit fields of the PWR_CR register */
 #define PWR_CR_LPDS                    ((uint16_t)0x0001)
 #define PWR_CR_PDDS                    ((uint16_t)0x0002)
@@ -229,11 +278,22 @@ typedef struct
 #define RCC_PLLCFGR_PLLN               ((uint32_t)0x00007FC0)
 #define RCC_PLLCFGR_PLLP               ((uint32_t)0x00030000)
 #define RCC_PLLCFGR_PLLSRC             ((uint32_t)0x00400000)
+#define RCC_PLLCFGR_PLLSRC_HSI         ((uint32_t)0x00000000)
+#define RCC_PLLCFGR_PLLSRC_HSE         ((uint32_t)0x00400000)
+
 #define RCC_PLLCFGR_PLLQ               ((uint32_t)0x0F000000)
 
 /* Bit fields of the RCC_CFGR register */
 #define RCC_CFGR_SW                    ((uint32_t)0x00000003)
+#define RCC_CFGR_SW_HSI                ((uint32_t)0x00000000)
+#define RCC_CFGR_SW_HSE                ((uint32_t)0x00000001)
+#define RCC_CFGR_SW_PLL                ((uint32_t)0x00000002)
+
 #define RCC_CFGR_SWS                   ((uint32_t)0x0000000C)
+#define RCC_CFGR_SWS_HSI               ((uint32_t)0x00000000)
+#define RCC_CFGR_SWS_HSE               ((uint32_t)0x00000004)
+#define RCC_CFGR_SWS_PLL               ((uint32_t)0x00000008)
+
 #define RCC_CFGR_HPRE                  ((uint32_t)0x000000F0)
 #define RCC_CFGR_HPRE_DIV1             ((uint32_t)0x00000000)
 #define RCC_CFGR_HPRE_DIV2             ((uint32_t)0x00000080)
@@ -246,7 +306,19 @@ typedef struct
 #define RCC_CFGR_HPRE_DIV512           ((uint32_t)0x000000F0)
 
 #define RCC_CFGR_PPRE1                 ((uint32_t)0x00001C00)
+#define RCC_CFGR_PPRE1_DIV1            ((uint32_t)0x00000000)
+#define RCC_CFGR_PPRE1_DIV2            ((uint32_t)0x00001000)
+#define RCC_CFGR_PPRE1_DIV4            ((uint32_t)0x00001400)
+#define RCC_CFGR_PPRE1_DIV8            ((uint32_t)0x00001800)
+#define RCC_CFGR_PPRE1_DIV16           ((uint32_t)0x00001C00)
+
 #define RCC_CFGR_PPRE2                 ((uint32_t)0x0000E000)
+#define RCC_CFGR_PPRE2_DIV1            ((uint32_t)0x00000000)
+#define RCC_CFGR_PPRE2_DIV2            ((uint32_t)0x00008000)
+#define RCC_CFGR_PPRE2_DIV4            ((uint32_t)0x0000A000)
+#define RCC_CFGR_PPRE2_DIV8            ((uint32_t)0x0000C000)
+#define RCC_CFGR_PPRE2_DIV16           ((uint32_t)0x0000E000)
+
 #define RCC_CFGR_RTCPRE                ((uint32_t)0x001F0000)
 #define RCC_CFGR_MCO1                  ((uint32_t)0x00600000)
 #define RCC_CFGR_I2SSRC                ((uint32_t)0x00800000)
