@@ -99,6 +99,39 @@ peripheral(GPIO, help="GPIO port")
     register(AFR, 32, arraySize=2, help="alternate function register")
 }
 
+peripheral(PWR, help="Power control")
+{
+    register(CR, 16, help="power control register")
+    {
+        bit(LPDS)
+        bit(PDDS)
+        bit(CWUF)
+        bit(CSBF)
+        bit(PVDE)
+        bit(PLS, 3)
+        bit(DBP)
+        bit(FPDS)
+        reserved(4)
+        bit(VOS)
+        reserved(1)
+    }
+    reserved(16)
+    register(CSR, 16, help="power control/status register")
+    {
+        bit(WUF)
+        bit(SBF)
+        bit(PVDO)
+        bit(BRR)
+        reserved(4)
+        bit(EWUP)
+        bit(BRE)
+        reserved(4)
+        bit(VOSRDY)
+        reserved(1)
+    }
+    reserved(16)
+}
+
 peripheral(RCC)
 {
     register(CR, 32, help="clock control register")
@@ -451,6 +484,8 @@ map(GPIO, GPIOF, AHB1_BASE, 0x1400)
 map(GPIO, GPIOG, AHB1_BASE, 0x1800)
 map(GPIO, GPIOH, AHB1_BASE, 0x1C00)
 map(GPIO, GPIOI, AHB1_BASE, 0x2000)
+
+map(PWR, PWR, APB1_BASE, 0x7000)
 
 map(RCC, RCC, AHB1_BASE, 0x3800)
 

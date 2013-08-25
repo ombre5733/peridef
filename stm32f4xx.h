@@ -83,6 +83,14 @@ typedef struct
 
 typedef struct
 {
+    volatile uint16_t CR;
+    uint16_t reserved0;
+    volatile uint16_t CSR;
+    uint16_t reserved1;
+} PWR_TypeDef;
+
+typedef struct
+{
     volatile uint32_t CR;
     volatile uint32_t PLLCFGR;
     volatile uint32_t CFGR;
@@ -150,6 +158,7 @@ typedef struct
 #define GPIOG                          ((GPIO_TypeDef*)(AHB1_BASE + (uintptr_t)0x00001800))
 #define GPIOH                          ((GPIO_TypeDef*)(AHB1_BASE + (uintptr_t)0x00001C00))
 #define GPIOI                          ((GPIO_TypeDef*)(AHB1_BASE + (uintptr_t)0x00002000))
+#define PWR                            ((PWR_TypeDef*)(APB1_BASE + (uintptr_t)0x00007000))
 #define RCC                            ((RCC_TypeDef*)(AHB1_BASE + (uintptr_t)0x00003800))
 #define USART2                         ((USART_TypeDef*)(APB1_BASE + (uintptr_t)0x00004400))
 #define USART3                         ((USART_TypeDef*)(APB1_BASE + (uintptr_t)0x00004800))
@@ -180,6 +189,26 @@ typedef struct
 #define CAN_RDTR_DLC                   ((uint32_t)0x0000000F)
 #define CAN_RDTR_FMI                   ((uint32_t)0x0000FF00)
 #define CAN_RDTR_TIME                  ((uint32_t)0xFFFF0000)
+
+/* Bit fields of the PWR_CR register */
+#define PWR_CR_LPDS                    ((uint16_t)0x0001)
+#define PWR_CR_PDDS                    ((uint16_t)0x0002)
+#define PWR_CR_CWUF                    ((uint16_t)0x0004)
+#define PWR_CR_CSBF                    ((uint16_t)0x0008)
+#define PWR_CR_PVDE                    ((uint16_t)0x0010)
+#define PWR_CR_PLS                     ((uint16_t)0x00E0)
+#define PWR_CR_DBP                     ((uint16_t)0x0100)
+#define PWR_CR_FPDS                    ((uint16_t)0x0200)
+#define PWR_CR_VOS                     ((uint16_t)0x4000)
+
+/* Bit fields of the PWR_CSR register */
+#define PWR_CSR_WUF                    ((uint16_t)0x0001)
+#define PWR_CSR_SBF                    ((uint16_t)0x0002)
+#define PWR_CSR_PVDO                   ((uint16_t)0x0004)
+#define PWR_CSR_BRR                    ((uint16_t)0x0008)
+#define PWR_CSR_EWUP                   ((uint16_t)0x0100)
+#define PWR_CSR_BRE                    ((uint16_t)0x0200)
+#define PWR_CSR_VOSRDY                 ((uint16_t)0x4000)
 
 /* Bit fields of the RCC_CR register */
 #define RCC_CR_HSION                   ((uint32_t)0x00000001)
