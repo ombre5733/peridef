@@ -58,7 +58,7 @@ class Register(object):
     def setParameters(self, params):
         for p in params:
             if p[0] == "arraySize":
-                self.arraySize = int(p[1])
+                self.arraySize = int(p[1], 0)
             else:
                 self.parameters.append((p[0], p[1]))
 
@@ -94,6 +94,7 @@ class BitField(object):
     def __init__(self, size, name=None):
         self.name = None
         self.size = size
+        self.values = []
 
     def __str__(self):
         if self.name:
@@ -101,6 +102,9 @@ class BitField(object):
         else:
             return '<reserved>:%d' % self.size
 
+    def addValue(self, name, value):
+        self.values.append((name, value))
+        
     @property
     def isReserved(self):
         return self.name is None
@@ -197,11 +201,11 @@ def toPeripheral(t):
 
 def toRegister(t):
     if t[0] == "reserved":
-        r = Register.createReserved(int(t["size"]))
+        r = Register.createReserved(int(t["size"], 0))
     else:
         assert(t[0] == "register")
         if "size" in t.keys():
-            r = Register.createFromSize(t["name"], int(t["size"]))
+            r = Register.createFromSize(t["name"], int(t["size"], 0))
         else:
             r = Register.createFromType(t["name"], t["type"])
     if "parameters" in t.keys():
@@ -213,14 +217,17 @@ def toRegister(t):
 
 def toBitField(t):
     if t[0] == "reserved":
-        b = BitField.createReserved(int(t["size"]))
+        b = BitField.createReserved(int(t["size"], 0))
     else:
         assert(t[0] == "bit")
         if "size" in t:
-            size = int(t["size"])
+            size = int(t["size"], 0)
         else:
             size = 1
         b = BitField.create(t["name"], size)
+        if "body" in t.keys():
+            for nvp in t["body"][0]:
+                b.addValue(nvp[0], int(nvp[1], 0))
     return b
 
 def toTuple(t):
@@ -249,27 +256,19 @@ def toMap(t):
 #     Parser
 # ----======================================================================----
 def parseDefinitionFile(source):
-    def joinTokens(tokens):
-        return "".join(tokens);
-
-    def toNumber(text):
-        if text.lower().startswith('0x'):
-            return int(text, 16)
-        else:
-            return int(text, 10)
-
     comma = pyparsing.Literal(',').suppress();
     lbrace = pyparsing.Literal('{').suppress();
     rbrace = pyparsing.Literal('}').suppress();
     lparen = pyparsing.Literal('(').suppress();
     rparen = pyparsing.Literal(')').suppress();
-    semi = pyparsing.Literal(';').suppress();
     equal = pyparsing.Literal('=').suppress();
 
     integer = pyparsing.Word(pyparsing.nums)
+    binNumber = pyparsing.Combine(pyparsing.Literal('0b')
+                                  + pyparsing.Word('01'))
     hexNumber = pyparsing.Combine(pyparsing.Literal('0x')
                                   + pyparsing.Word(pyparsing.hexnums))
-    number = integer ^ hexNumber
+    number = integer ^ binNumber ^ hexNumber
 
     identifier = pyparsing.Word(pyparsing.alphas + '_',
                                 pyparsing.alphanums + '_');
@@ -284,13 +283,23 @@ def parseDefinitionFile(source):
                       keyValuePair
                       + pyparsing.ZeroOrMore(comma + keyValuePair))
 
+    nameValuePair = pyparsing.Group(
+                        identifier 
+                        + equal
+                        + number)
+
+    bitFieldBody = pyparsing.Group(
+                       lbrace
+                       + pyparsing.OneOrMore(nameValuePair)
+                       +rbrace)
     bitField = pyparsing.Group(
                    pyparsing.Literal("bit")
                    + lparen
                    + identifier("name")
                    + pyparsing.Optional(
                          comma + number("size"))
-                   + rparen)
+                   + rparen
+                   + pyparsing.Optional(bitFieldBody)("body"))
     reservedBit = pyparsing.Group(
                       pyparsing.Literal("reserved")
                       + lparen
@@ -509,6 +518,13 @@ class CFilePrinter(object):
                 fmt = '((uint%%d_t)0x%%0%dX)' % (r.size / 4)
                 s += "#define {0:<30} {1}\n".format(
                          prefix + '_' + b.name, fmt % (r.size, mask))
+                vs = ""
+                for v in b.values:
+                    vs += "#define {0:<30} {1}\n".format(
+                              prefix + '_' + b.name + '_' + v[0],
+                              fmt % (r.size, v[1] << offset))
+                if vs:
+                    s += vs + '\n'
             offset += b.size
         if s:
             s = "/* Bit fields of the {0} register */\n".format(

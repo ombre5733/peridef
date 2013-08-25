@@ -169,6 +169,17 @@ peripheral(RCC)
         bit(SW, 2)
         bit(SWS, 2)
         bit(HPRE, 4)
+        {
+            DIV1   = 0b0000
+            DIV2   = 0b1000
+            DIV4   = 0b1001
+            DIV8   = 0b1010
+            DIV16  = 0b1011
+            DIV64  = 0b1100
+            DIV128 = 0b1101
+            DIV256 = 0b1110
+            DIV512 = 0b1111
+        }
         reserved(2)
         bit(PPRE1, 3)
         bit(PPRE2, 3)
