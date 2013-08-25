@@ -165,6 +165,20 @@ peripheral(RCC)
         reserved(4)
     }
     register(CFGR, 32, help="clock configuration register")
+    {
+        bit(SW, 2)
+        bit(SWS, 2)
+        bit(HPRE, 4)
+        reserved(2)
+        bit(PPRE1, 3)
+        bit(PPRE2, 3)
+        bit(RTCPRE, 5)
+        bit(MCO1, 2)
+        bit(I2SSRC)
+        bit(MCO1PRE, 3)
+        bit(MCO2PRE, 3)
+        bit(MCO, 2)
+    }
     register(CIR, 32, help="clock interrupt register")
     register(AHB1RSTR, 32, help="AHB1 peripheral reset register")
     {

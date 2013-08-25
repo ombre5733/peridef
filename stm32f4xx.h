@@ -231,6 +231,19 @@ typedef struct
 #define RCC_PLLCFGR_PLLSRC             ((uint32_t)0x00400000)
 #define RCC_PLLCFGR_PLLQ               ((uint32_t)0x0F000000)
 
+/* Bit fields of the RCC_CFGR register */
+#define RCC_CFGR_SW                    ((uint32_t)0x00000003)
+#define RCC_CFGR_SWS                   ((uint32_t)0x0000000C)
+#define RCC_CFGR_HPRE                  ((uint32_t)0x000000F0)
+#define RCC_CFGR_PPRE1                 ((uint32_t)0x00001C00)
+#define RCC_CFGR_PPRE2                 ((uint32_t)0x0000E000)
+#define RCC_CFGR_RTCPRE                ((uint32_t)0x001F0000)
+#define RCC_CFGR_MCO1                  ((uint32_t)0x00600000)
+#define RCC_CFGR_I2SSRC                ((uint32_t)0x00800000)
+#define RCC_CFGR_MCO1PRE               ((uint32_t)0x07000000)
+#define RCC_CFGR_MCO2PRE               ((uint32_t)0x38000000)
+#define RCC_CFGR_MCO                   ((uint32_t)0xC0000000)
+
 /* Bit fields of the RCC_AHB1RSTR register */
 #define RCC_AHB1RSTR_GPIOARST          ((uint32_t)0x00000001)
 #define RCC_AHB1RSTR_GPIOBRST          ((uint32_t)0x00000002)
